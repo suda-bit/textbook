@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<!-- Finalized for 2年生（コード整備のみ／内容不変） on 2026-01-19 03:32 -->
+<html lang="ja">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>北海学園札幌高校 2年 教科書シミュレーター</title>
+<style>
+:root{--brand:#0a3a7a;--brand-2:#0f4c9a;--gold:#d4af37;--bg:#f6f8fc;--panel:#ffffff;--ink:#1b2330;--muted:#6b7280;--ok:#137333;--warn:#b26b00;--err:#b00020;--ring:0 0 0 3px rgba(13,110,253,.25);--shadow:0 10px 30px rgba(10,58,122,.12);--radius:14px}
+@media (prefers-color-scheme: dark){:root{--bg:#0f1724;--panel:#0f1b2f;--ink:#e8eefb;--muted:#97a2b9;--shadow:0 12px 28px rgba(0,0,0,.5)}}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:radial-gradient(800px 400px at -10% -10%,#e9f1ff,transparent 55%),radial-gradient(900px 400px at 110% 0%,#fff3d6,transparent 55%),linear-gradient(180deg,#ffffff,var(--bg));color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,'Hiragino Sans','Yu Gothic',sans-serif}
+.container{max-width:1120px;margin:clamp(10px,3vw,28px) auto;padding:clamp(10px,2vw,20px)}
+.visually-hidden{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;border:0;clip:rect(0 0 0 0);overflow:hidden}
+.app-header{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#ffffffb5,#ffffff40);border:1px solid #ffffff70;backdrop-filter:blur(10px);padding:14px 18px;border-radius:16px;box-shadow:var(--shadow);position:sticky;top:10px;z-index:5}
+.logo{width:56px;height:56px;border-radius:12px;display:grid;place-items:center;background:#fff;border:2px solid var(--gold);overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.title{margin:0;font-weight:800;letter-spacing:.02em;color:var(--brand);font-size:clamp(1.15rem,2.2vw,1.6rem)}
+.subtitle{margin:0;color:var(--muted);font-size:.9rem}
+.stepper{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
+.step-pill{flex:1 1 160px;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:999px;background:#fff;border:1px solid #e6ebf5;color:#667085;font-weight:700;box-shadow:0 3px 12px rgba(0,0,0,.05)}
+.step-pill .dot{width:24px;height:24px;border-radius:999px;display:grid;place-items:center;background:#eef2f8;color:#304056;font-weight:800;font-size:.9rem}
+.step-pill[aria-current="step"]{color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand-2));border-color:transparent}
+.step-pill[aria-current="step"] .dot{background:#ffffff33;color:#fff}
+.step-pill.done{background:#0a3a7a10;color:var(--brand);border-color:#0a3a7a30}
+.main{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-top:16px}
+@media (max-width:960px){.main{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid #ffffff40;border-radius:var(--radius);box-shadow:var(--shadow)}
+.content-panel{padding:clamp(14px,2.2vw,22px)}
+.preview-panel{position:sticky;top:86px;align-self:start}
+.preview-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #e9eef7;background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;border-radius:var(--radius) var(--radius) 0 0}
+.preview-body{padding:12px 16px;max-height:70vh;overflow:auto}
+.badge{background:#ffffff25;border:1px solid #ffffff55;padding:4px 10px;border-radius:999px;font-weight:700;font-size:.82rem}
+.section{margin-bottom:16px}
+.section h3{margin:0 0 6px;color:var(--brand)}
+.help{color:var(--muted);font-size:.9rem;margin:-2px 0 8px}
+.btn-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+button.selector{position:relative;padding:14px;border-radius:12px;border:1px solid #e7ecf6;background:#fff;text-align:left;font-weight:800;color:#2c3446;cursor:pointer;transition:transform .08s ease,box-shadow .2s ease;box-shadow:0 6px 16px rgba(10,58,122,.08)}
+button.selector .hint{display:block;font-size:.82rem;color:var(--muted);font-weight:600;margin-top:4px}
+button.selector:hover{transform:translateY(-2px);box-shadow:0 14px 28px rgba(10,58,122,.16),var(--ring)}
+button.selector[aria-pressed="true"],button.selector:focus{outline:3px solid #0a3a7a66}
+.chk-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.chk{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #e7ecf6;border-radius:12px;padding:10px}
+.chk input{transform:scale(1.2)}
+.table{width:100%;border-collapse:collapse;background:#fff}
+.table th,.table td{padding:10px 12px;border-bottom:1px solid #eef2f8;font-size:.92rem}
+.table th{background:#f9fbff;color:#445;text-align:left}
+.table td.r{text-align:right;white-space:nowrap}
+.total-row{display:flex;justify-content:flex-end;gap:12px;padding:12px 16px;border-top:2px solid #f2e9c9;background:#fffaf2;color:#7a5600;font-weight:800}
+.note{font-size:.88rem;color:var(--muted)}
+.warning{color:var(--warn)}
+.ok{color:var(--ok)}
+.status-pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 8px;font-size:.8rem;border:1px solid #e7ecf6;background:#fff}
+.status-pill.ok{border-color:#cfe8d8;color:var(--ok);background:#f0fbf4}
+.status-pill.warn{border-color:#f1e0c4;color:var(--warn);background:#fff8eb}
+.skeleton{position:relative;overflow:hidden;background:#eef2f8}
+.skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);animation:shimmer 1.2s infinite}
+@keyframes shimmer{100%{transform:translateX(100%)}}
+.hidden{display:none!important}
+.spacer{height:8px}
+.actions{display:flex;gap:10px;margin-top:10px}
+.primary{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;border:none;border-radius:10px;padding:12px 14px;font-weight:800;cursor:pointer}
+.primary:disabled{opacity:.6}
+.secondary{background:#eef2f8;color:#304056;border:none;border-radius:10px;padding:12px 14px;font-weight:800;cursor:pointer}
+@media print{.app-header,.stepper,.preview-panel,.actions{display:none!important}.panel{box-shadow:none;border:none}.content-panel{padding:0}#print-header{display:block!important;border-bottom:2px solid #e5e7eb;margin-bottom:12px;padding-bottom:8px}}
+#print-header{display:none}
+#print-header h2{margin:0 0 4px}
+#print-header .meta{font-size:.9rem;color:#4a5568}
+</style>
+</head>
+<body>
+<div class="container">
+<header class="app-header panel" role="banner">
+<div aria-hidden="true" class="logo">./00学園札幌校章カラー.bmp</div>
+<div>
+<h1 class="title">北海学園札幌高校 2年 教科書シミュレーター</h1>
+</div>
+</header>
+<nav aria-label="進行状況" class="stepper">
+<div class="step-pill hidden" id="pill-grade"><span class="dot">1</span>学年</div>
+<div aria-current="step" class="step-pill" id="pill-course"><span class="dot">1</span>コース</div>
+<div class="step-pill" id="pill-track"><span class="dot">2</span>進路</div>
+<div class="step-pill" id="pill-elective"><span class="dot">3</span>選択</div>
+<div class="step-pill" id="pill-result"><span class="dot">4</span>確認</div>
+</nav>
+<div class="main">
+<main aria-live="polite" class="panel content-panel" id="content">
+<div aria-hidden="true" id="print-header">
+<h2>教科書購入控え</h2>
+<div class="meta" id="print-meta">学年・コース・進路／作成日</div>
+</div>
+<section aria-labelledby="c-title" class="step" id="step-course">
+<h2 class="visually-hidden" id="c-title">コース</h2>
+<div aria-label="コースを選択" class="section" role="radiogroup">
+<h3>コースを選択 <span class="status-pill warn" id="st-course">未選択</span></h3>
+<div class="btn-grid" id="course-btns"></div>
+</div>
+</section>
+<section aria-labelledby="t-title" class="step hidden" id="step-track">
+<h2 class="visually-hidden" id="t-title">進路</h2>
+<div aria-label="進路を選択" class="section" role="radiogroup">
+<h3>進路（文理）を選択 <span class="status-pill warn" id="st-track">未選択</span></h3>
+<div class="btn-grid">
+<button aria-checked="false" aria-pressed="false" class="selector" onclick="pickTrack('文系', this)" role="radio">文系</button>
+<button aria-checked="false" aria-pressed="false" class="selector" onclick="pickTrack('理系', this)" role="radio">理系</button>
+</div>
+<div class="actions"><button class="secondary" onclick="goStep('course')">戻る</button></div>
+</div>
+</section>
+<section aria-labelledby="e-title" class="step hidden" id="step-elective">
+<h2 class="visually-hidden" id="e-title">選択</h2>
+<div class="section skeleton" id="elective-skeleton" style="height:120px;border-radius:12px"></div>
+<div aria-live="polite" class="hidden" id="elective-sections"></div>
+<div class="actions">
+<button class="secondary" onclick="prevFromElective()">戻る</button>
+<button class="primary" disabled id="btn-final" onclick="finalize()">選択を確定して結果へ</button>
+</div>
+</section>
+<section aria-labelledby="r-title" class="step hidden" id="step-result">
+<h2 class="visually-hidden" id="r-title">結果</h2>
+<div class="section">
+<h3>結果 <span class="status-pill ok" id="st-result">作成済み</span></h3>
+<div class="note">必修・選択を合算しています。価格未登録は¥0（※要確認）で表示します。</div>
+<div class="spacer"></div>
+<div class="panel">
+<div class="preview-header">
+<div id="res-info">集計</div>
+<span class="badge" id="res-count">0 点</span>
+</div>
+<div class="preview-body">
+<table class="table">
+<thead><tr><th>教材名</th><th class="r">定価</th></tr></thead>
+<tbody id="res-list"></tbody>
+</table>
+<div class="total-row"><span>合計金額:</span><strong id="res-total">¥0</strong></div>
+</div>
+</div>
+<div class="actions"><button class="primary" id="btn-vendor" onclick="openVendorSheet()">教科書購入表を表示</button><button class="secondary" onclick="location.reload()">最初に戻る</button></div>
+</div>
+</section>
+</main>
+<aside aria-label="選択状況サマリー" class="panel preview-panel">
+<div class="preview-header"><strong>選択状況</strong><span class="badge" id="pv-count">0 点</span></div>
+<div class="preview-body">
+<div class="note">価格未登録は ¥0（※要確認）として表示します。</div>
+<div class="spacer"></div>
+<table class="table">
+<thead><tr><th>教材名</th><th class="r">概算</th></tr></thead>
+<tbody id="pv-list"></tbody>
+</table>
+<div class="total-row"><span>概算合計:</span><strong id="pv-total">¥0</strong></div>
+<div class="spacer"></div>
+<div class="note warning" id="pv-missing">必須の選択数を満たしていない項目があります。</div>
+</div>
+</aside>
+</div>
+</div>
+<div aria-live="polite" class="visually-hidden" id="live-region"></div>
+<script>
+const selections = { grade:'2', course:'', track:'', choices:{} };
+const $ = s => document.querySelector(s);
+const stepEls = { course:$('#step-course'), track:$('#step-track'), elective:$('#step-elective'), result:$('#step-result') };
+const pillEls = { course:$('#pill-course'), track:$('#pill-track'), elective:$('#pill-elective'), result:$('#pill-result') };
+const statusEls = { course:$('#st-course'), track:$('#st-track') };
+
+function setStepper(state){
+  for(const k in pillEls){ const p=pillEls[k]; if(!p) continue; p.removeAttribute('aria-current'); p.classList.toggle('done', false);} 
+  if(pillEls[state]) pillEls[state].setAttribute('aria-current','step');
+  const order=['course','track','elective','result'];
+  for(const k of order){ if(k===state) break; if(pillEls[k]) pillEls[k].classList.add('done'); }
+}
+function goStep(id){
+  Object.entries(stepEls).forEach(([k,el])=>{ if('step-'+id===el.id) el.classList.remove('hidden'); else el.classList.add('hidden'); });
+  setStepper(id); updatePreview();
+  try { var aside = document.querySelector('.preview-panel'); if (aside) { aside.classList.toggle('hidden', id==='result'); } } catch(e){}
+  announce(`ステップを${id}に移動しました。`);
+}
+function announce(msg){ const live=$('#live-region'); if(!live) return; live.textContent=''; setTimeout(()=> live.textContent=msg, 10); }
+
+const baseDB = {
+ '2': { common: [
+ {n:"精選 論理国語", p:930},{n:"文学国語", p:993},{n:"古典探究(古文)", p:661},
+ {n:"古典探究(漢文)", p:412},{n:"公共", p:721},{n:"数学C Standard", p:714},
+ {n:"Vivid English Comm II", p:729},{n:"Logic & Expression II", p:642},
+ {n:"最新情報I", p:1072},{n:"数学C ワークWIDE", p:550},{n:"情報I学習ノート", p:670}
+ ], geoHist: [ {group:'地歴・公民（1科目）', options:[
+ {name:'日本史探究', books:[{n:'詳説 日本史', p:941},{n:'日本史ノート', p:850}]},
+ {name:'世界史探究', books:[{n:'詳説 世界史', p:941},{n:'世界史ノート', p:850}]},
+ {name:'地理探究', books:[{n:'詳説 地理探究', p:1053}]}
+ ]} ] }
+};
+
+function markPressed(btn){ if(!btn) return; const sibs=btn.parentElement.querySelectorAll('button.selector'); sibs.forEach(b=>{b.setAttribute('aria-pressed','false'); b.setAttribute('aria-checked','false');}); btn.setAttribute('aria-pressed','true'); btn.setAttribute('aria-checked','true'); }
+
+function pickCourse(c){ selections.course=c; selections.choices={}; statusEls.course.className='status-pill ok'; statusEls.course.textContent='選択済み';
+  const needTrack = true; // 全コースで進路選択を表示
+  if(needTrack){ goStep('track'); } else { buildElectives(); goStep('elective'); }
+}
+
+function pickTrack(t, btn){ selections.track=t; markPressed(btn); statusEls.track.className='status-pill ok'; statusEls.track.textContent='選択済み'; buildElectives(); goStep('elective'); }
+
+function section(title){ const wrap=document.createElement('div'); wrap.className='section'; const h=document.createElement('h3'); h.textContent=title; wrap.appendChild(h); return wrap; }
+function help(text){ const d=document.createElement('div'); d.className='help'; d.textContent=text; return d; }
+
+function makeSingleChoiceSection(title, options, key){ const sec=section(title); const list=document.createElement('div'); list.className='btn-grid'; const badge=document.createElement('span'); badge.className='status-pill warn'; badge.textContent='未選択'; sec.querySelector('h3').appendChild(document.createTextNode(' ')); sec.querySelector('h3').appendChild(badge); options.forEach(opt=>{ const b=document.createElement('button'); b.className='selector'; b.innerHTML=`${opt.name} <span class='hint'>${opt.books.length}冊</span>`; b.setAttribute('role','radio'); b.setAttribute('aria-checked','false'); b.onclick=()=>{ selections.choices[key]=opt; list.querySelectorAll('button').forEach(x=>{x.setAttribute('aria-pressed','false'); x.setAttribute('aria-checked','false');}); b.setAttribute('aria-pressed','true'); b.setAttribute('aria-checked','true'); badge.className='status-pill ok'; badge.textContent='選択済み'; updatePreview(); updateFinalizeState(); }; list.appendChild(b); }); sec.appendChild(list); return sec; }
+
+function makeRequiredSingleFromOptions(title, options, key){
+ const sec = section(title); // タイトル例: 学校設定教科 / 学校設定教科（語学）
+ const list = document.createElement('div');
+ list.className = 'btn-grid';
+ const badge = document.createElement('span');
+ badge.className='status-pill warn';
+ badge.textContent='未選択';
+ sec.querySelector('h3').appendChild(document.createTextNode(' '));
+ sec.querySelector('h3').appendChild(badge);
+ selections.choices[key] = [];
+ options.forEach(opt=>{
+ const b = document.createElement('button');
+ b.className='selector';
+ b.innerHTML = `${opt.name} <span class='hint'>${opt.books.length}冊</span>`;
+ b.setAttribute('role','radio');
+ b.setAttribute('aria-checked','false');
+ b.onclick = ()=>{
+ selections.choices[key] = [opt];
+ list.querySelectorAll('button').forEach(x=>{x.setAttribute('aria-pressed','false');x.setAttribute('aria-checked','false');});
+ b.setAttribute('aria-pressed','true');
+ b.setAttribute('aria-checked','true');
+ badge.className='status-pill ok';
+ badge.textContent='選択済み';
+ updatePreview();
+ updateFinalizeState();
+ };
+ list.appendChild(b);
+ });
+ sec.appendChild(list);
+ sec.dataset.require = 1;
+ sec.dataset.key = key;
+ return sec;
+}
+
+function autoAddSection(title, books){ const sec=section(title); const table=document.createElement('table'); table.className='table'; const tb=document.createElement('tbody'); books.forEach(b=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${b.n}${b.note? ' <span class=\'warning\'>'+b.note+'</span>':''}</td><td class='r'>¥${(b.p||0).toLocaleString()}</td>`; tb.appendChild(tr); }); table.appendChild(tb); sec.appendChild(table); selections.choices['auto_'+title]={name:title, books:books}; return sec; }
+
+function buildElectives(){ $('#elective-skeleton').classList.remove('hidden'); $('#elective-sections').classList.add('hidden'); setTimeout(()=>{ const holder=$('#elective-sections'); holder.innerHTML=''; const g=selections.grade; const course=selections.course;
+ // 必修（自動追加）
+ const must=section('必修（自動追加）'); must.appendChild(help('この学年で全員が購入する教科書です。結果にも自動で含まれます。'));
+ const table=document.createElement('table'); table.className='table'; const tb=document.createElement('tbody'); (baseDB[g].common||[]).forEach(b=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${b.n}</td><td class='r'>¥${(b.p||0).toLocaleString()}</td>`; tb.appendChild(tr); }); table.appendChild(tb); must.appendChild(table); holder.appendChild(must);
+ // 地歴・公民（1科目）
+ const gh = baseDB['2'].geoHist[0]; let opts = gh.options; if(selections.course==='特進'){ opts = opts.filter(o=> o.name!=='世界史探究'); } holder.appendChild(makeSingleChoiceSection(gh.group, opts, 'geoHist'));
+ // 理科（文理分岐）
+ if(selections.track==='理系'){
+   const phy = {name:'物理', books:[{n:'物理', p:1200}]};
+   const chem = {name:'化学', books:[{n:'化学', p:1150}]};
+   const bio  = {name:'生物', books:[{n:'生物', p:1100}]};
+   const pairOptions = [
+     {name:'化学・生物', books:[...chem.books, ...bio.books]},
+     {name:'化学・物理', books:[...chem.books, ...phy.books]}
+   ];
+   holder.appendChild(makeRequiredSingleFromOptions('理系理科（2科目の組合せ）', pairOptions, 'sci2_pair'));
+ } else {
+   const auto=[{n:'化学探究', p:0, note:'※要確認'},{n:'生物探究', p:0, note:'※要確認'}];
+   holder.appendChild(autoAddSection('理科（文系は探究2科必修）', auto));
+ }
+ // 学校設定教科（重複見出しなしで、個別セクションのみ追加）
+ if(course){
+   if(course==='メディカルプレップ' || course==='総合進学'){
+     const reqOptions = [
+       {name:'会計学I', books:[{n:'【教材未登録】会計学I', p:0, note:'※要確認'}]},
+       {name:'英語基礎探究', books:[{n:'【教材未登録】英語基礎探究', p:0, note:'※要確認'}]},
+       {name:'MESE講座', books:[{n:'【教材未登録】MESE講座', p:0, note:'※要確認'}]}
+     ];
+     holder.appendChild(makeRequiredSingleFromOptions('学校設定教科', reqOptions, 'schoolset_required'));
+   } else if(course==='グローバル'){
+     const langOptions = [
+       {name:'中国語', books:[{n:'【教材未登録】中国語', p:0, note:'※要確認'}]},
+       {name:'韓国語', books:[{n:'【教材未登録】韓国語', p:0, note:'※要確認'}]}
+     ];
+     holder.appendChild(makeRequiredSingleFromOptions('学校設定教科（語学）', langOptions, 'schoolset_lang'));
+   } else {
+     // 特進：学校設定なし
+   }
+ }
+ updatePreview(); updateFinalizeState(); $('#elective-skeleton').classList.add('hidden'); holder.classList.remove('hidden'); }, 450); }
+
+function aggregateBooks(){ const g=selections.grade; let books=[]; if(!g) return []; books = books.concat(baseDB[g].common || []); if(selections.course==='特進'){ books.push({n:'特進専用 共テ対策問題集', p:1060}); } Object.values(selections.choices).forEach(sel=>{ if(!sel) return; if(Array.isArray(sel)){ sel.forEach(o=> books = books.concat(o.books)); } else if(sel.books){ books = books.concat(sel.books); } }); return books; }
+
+function computeMissing(){ const reqs=document.querySelectorAll('[data-require]'); let items=[]; reqs.forEach(sec=>{ const need=parseInt(sec.dataset.require,10); const key=sec.dataset.key; const picked=((selections.choices[key]||[])).length; const remain=need-picked; if(remain>0){ const title=sec.querySelector('h3')? sec.querySelector('h3').textContent.replace(/（.*?）/,'') : '選択'; items.push(`${title}: あと${remain}科目`); } }); return items; }
+
+function updatePreview(){ const list=$('#pv-list'); const cnt=$('#pv-count'); const tot=$('#pv-total'); list.innerHTML=''; const books=aggregateBooks(); let total=0; books.forEach(b=>{ const tr=document.createElement('tr'); const note=b.note?` <span class='warning'>${b.note}</span>`:''; tr.innerHTML=`<td>${b.n}${note}</td><td class='r'>¥${(b.p||0).toLocaleString()}</td>`; list.appendChild(tr); total+=(b.p||0); }); cnt.textContent=`${books.length} 点`; tot.textContent=`¥${total.toLocaleString()}`; const missing=computeMissing(); const pv=$('#pv-missing'); pv.textContent = (missing.length? ('未完了: '+missing.join(' / ')) : 'すべての必須選択が満たされています。'); $('#btn-final').disabled = missing.length>0; }
+
+function updateFinalizeState(){ const missing=computeMissing(); $('#btn-final').disabled = missing.length>0; }
+
+function finalize(){ const missing=computeMissing(); if(missing.length){ alert('未完了の項目があります: '+missing.join(' / ')); return; } const listBody=$('#res-list'); listBody.innerHTML=''; const books=aggregateBooks(); let total=0; let count=0; books.forEach(b=>{ const tr=document.createElement('tr'); const note=b.note?` <span class='warning'>${b.note}</span>`:''; tr.innerHTML=`<td>${b.n}${note}</td><td class='r'>¥${(b.p||0).toLocaleString()}</td>`; listBody.appendChild(tr); total+=(b.p||0); count++; }); const track = selections.track ? `（${selections.track}）` : '';
+ $('#res-info').textContent = `${selections.grade}年 ${selections.course}コース${track}`;
+ $('#res-count').textContent = `${count} 点`;
+ $('#res-total').textContent = `¥${total.toLocaleString()}`;
+ const today=new Date(); const y=today.getFullYear(), m=('0'+(today.getMonth()+1)).slice(-2), d=('0'+today.getDate()).slice(-2);
+ const trackMeta = selections.track ? `／進路：${selections.track}` : '';
+ $('#print-meta').textContent = `学年：${selections.grade}年／コース：${selections.course}${trackMeta}　作成日：${y}-${m}-${d}`;
+ $('#print-header').style.display='block'; goStep('result'); }
+
+function keyNavHandler(e){ const tgt=e.target; if(!tgt.classList.contains('selector')) return; const parent=tgt.parentElement; const btns=[...parent.querySelectorAll('button.selector')]; const idx=btns.indexOf(tgt); if(e.key==='ArrowRight' || e.key==='ArrowDown'){ const n=btns[(idx+1)%btns.length]; n.focus(); e.preventDefault(); } if(e.key==='ArrowLeft' || e.key==='ArrowUp'){ const p=btns[(idx-1+btns.length)%btns.length]; p.focus(); e.preventDefault(); } if(e.key==='Enter' || e.key===' '){ tgt.click(); e.preventDefault(); } }
+document.addEventListener('keydown', keyNavHandler, true);
+
+function prevFromElective(){
+  const trackVisible = !document.querySelector('#step-track').classList.contains('hidden');
+  goStep(trackVisible ? 'track' : 'course');
+}
+
+// 初期化：2年固定・コースから開始
+(function init(){
+ const box = document.querySelector('#course-btns');
+ if (box) {
+   box.innerHTML='';
+   ['特進','グローバル','メディカルプレップ','総合進学'].forEach(c=>{
+     const b=document.createElement('button'); b.className='selector'; b.textContent = `${c}コース`;
+     b.setAttribute('role','radio'); b.setAttribute('aria-checked','false');
+     b.onclick = ()=>{ markPressed(b); pickCourse(c); };
+     box.appendChild(b);
+   });
+ }
+ goStep('course');
+})();
+
+function openVendorSheet(){
+ const books = aggregateBooks();
+ let total = 0;
+ const rows = books.map(b=>{ const price=(b.p||0); total+=price; const note=b.note?` <span class='warning'>${b.note}</span>`:''; return `<tr><td>${b.n}${note}</td><td class='r'>¥${price.toLocaleString()}</td></tr>`; }).join('');
+ const ymd = (()=>{ const t=new Date(); const y=t.getFullYear(); const m=('0'+(t.getMonth()+1)).slice(-2); const d=('0'+t.getDate()).slice(-2); return `${y}-${m}-${d}`; })();
+ const meta = (()=>{ const base=`学年：${selections.grade}年／コース：${selections.course}`; return selections.track ? `${base}／進路：${selections.track}` : base; })();
+const selNames = [];
+Object.entries(selections.choices).forEach(([k,v])=>{
+  if(k && k.startsWith('auto_')) return;
+  if(Array.isArray(v)) v.forEach(o=>{ if(o&&o.name) selNames.push(o.name); });
+  else if(v && v.name) selNames.push(v.name);
+});
+const courseLine = selections.course ? `コース：${selections.course}` : 'コース：—';
+const trackLine = `進路：${selections.track||'—'}`;
+const choicesLine = `選択科目：${selNames.length? selNames.join('、'):'—'}`;
+const selectionSummary = `<div class='section'><h2 style="margin:10px 0 6px;color:#0a3a7a;font-size:1.05rem">選択内容</h2>`+
+  `<ul style="margin:6px 0 0 18px"><li>${courseLine}</li><li>${trackLine}</li><li>${choicesLine}</li></ul></div>`;
+
+ const win = window.open('', '_blank');
+ const html = `<!DOCTYPE html>
+<html lang='ja'>
+<head>
+<meta charset='UTF-8' />
+<meta name='viewport' content='width=device-width, initial-scale=1' />
+<title>教科書購入表（販売業者提出用）</title>
+<style>
+ :root{--ink:#1b2330;--muted:#6b7280;--brand:#0a3a7a}
+ body{margin:20px;font:14px/1.6 system-ui,-apple-system,Segoe UI,'Hiragino Sans','Yu Gothic',sans-serif;color:var(--ink)}
+ h1{font-size:1.3rem;margin:0 0 6px;color:var(--brand)}
+ .meta{color:var(--muted);margin-bottom:12px}
+ .grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:8px;margin:12px 0}
+ .field{display:flex;gap:6px;align-items:center}
+ .field label{white-space:nowrap;color:#374151;font-weight:600}
+ .field .box{flex:1 1 auto;border:1px solid #e5e7eb;padding:6px 8px;min-height:28px}
+ table{width:100%;border-collapse:collapse;margin-top:8px}
+ th,td{border-bottom:1px solid #e5e7eb;padding:8px 10px}
+ th{background:#f9fbff;text-align:left}
+ td.r{text-align:right;white-space:nowrap}
+ .tot{display:flex;justify-content:flex-end;gap:10px;margin-top:10px;padding:10px;border-top:2px solid #f3e8c9;background:#fffaf2;font-weight:800}
+ .note{font-size:.9rem;color:var(--muted)}
+ .flex{display:flex;gap:16px;margin-top:12px}
+ .flex .col{flex:1}
+ .stamp{height:54px;border:1px dashed #cbd5e1;background:#f8fafc}
+ .checks{display:flex;gap:12px;align-items:center}
+ .checks label{display:flex;gap:6px;align-items:center}
+ @media print{.print-hide{display:none!important}; body{margin:0;padding:20px}}
+</style>
+</head>
+<body>
+ <h1>教科書購入表（販売業者提出用）</h1>
+ <div class='meta'>${meta} ／ 作成日：${ymd}</div>
+  ${selectionSummary}
+ <div class='grid'>
+ <div class='field'><label>学年・組</label><div class='box'> <select id='fld-class'><option value='' disabled selected>選択</option><option>1年A組</option><option>1年B組</option><option>1年C組</option><option>1年D組</option><option>1年E組</option><option>1年F組</option><option>1年G組</option><option>1年H組</option><option>1年I組</option><option>1年J組</option><option>1年K組</option></select> </div></div>
+ <div class='field'><label>番号</label><div class='box'> <select id='fld-no'><option value='' disabled selected>選択</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option><option>18</option><option>19</option><option>20</option><option>21</option><option>22</option><option>23</option><option>24</option><option>25</option><option>26</option><option>27</option><option>28</option><option>29</option><option>30</option><option>31</option><option>32</option><option>33</option><option>34</option><option>35</option><option>36</option><option>37</option><option>38</option><option>39</option><option>40</option><option>41</option><option>42</option><option>43</option><option>44</option><option>45</option></select> </div></div>
+ <div class='field'><label>氏名</label><div class='box'> <input id='fld-name' type='text' placeholder='氏名を入力'/> </div></div>
+ <div class='field'><label>連絡先</label><div class='box'> </div></div>
+ </div>
+ <table>
+ <thead><tr><th>教材名</th><th class='r'>価格</th></tr></thead>
+ <tbody>${rows}</tbody>
+ </table>
+ <div class='tot'><span>合計金額：</span><strong>¥${total.toLocaleString()}</strong></div>
+ <div class='flex'>
+ <div class='col'>
+ <div class='field'><label>支払方法</label>
+ <div class='checks'>
+ <label><input type='checkbox' checked/> 現金</label> <label><input type='checkbox' disabled/> 振込</label> <label><input type='checkbox' disabled/> その他</label> </div>
+ </div>
+ <div class='field' style='margin-top:8px'><label>発注番号</label><div class='box'> </div></div>
+ </div>
+ <div class='col'>
+ <div class='field' style='margin-top:8px'><label>受付印</label><div class='box stamp'> </div></div>
+ </div>
+ </div>
+ <div class='note' style='margin-top:12px'>※ 価格未登録の科目は「¥0（要確認）」として表示されています。販売業者確定価格で精算してください。</div>
+ <div class='print-hide' style='margin-top:14px'>
+ <button onclick='window.print()' style='padding:8px 12px'>印刷する</button>
+ </div>
+</body>
+</html>`;
+ win.document.open(); win.document.write(html); win.document.close();
+}
+</script>
+</body>
+</html>
